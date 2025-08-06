@@ -1,68 +1,128 @@
-# Una aplicación vulnerable para aplicar seguridad
+````markdown
+# 🚨 Aplicación Vulnerable para Prácticas de Seguridad DevSecOps
 
-### Cómo Desplegar aplicación Docker NodeJS en Heroku de forma local
+Este proyecto es una aplicación Node.js vulnerable, diseñada para practicar la integración de **herramientas de seguridad en pipelines CI/CD** y desplegar en **Heroku** mediante **Docker** y **GitHub Actions**.
 
-Pasos:
+---
 
-Forkear el Repo
+## 🐳 Despliegue en Heroku con Docker (local y CI/CD)
 
+### 1. Requisitos
+- Cuenta en [Heroku](https://id.heroku.com/)
+- Heroku CLI instalado
+- Docker instalado
+- Git configurado
 
-### Ahora vamos a Heroku
+### 2. Clonar o forkar este repositorio
 
-Crear cuenta, logearse y descargar heroku cli  https://id.heroku.com/
+```bash
+git clone https://github.com/<tu-usuario>/vulnerable-web-app.git
+cd vulnerable-web-app
+````
 
-Luego en la terminal logearse
+### 3. Login en Heroku
 
-```
- heroku login
-```
-Login en heroku container
-```
+```bash
+heroku login
 heroku container:login
 ```
-Crear target de la aplicacion
-```
+
+### 4. Crear aplicación y configurar
+
+```bash
 heroku create <YOUR_APP_NAME>
-```
-Conectar git local en remote heroku 
-```
 heroku git:remote -a <YOUR_APP_NAME>
 ```
-Build la imagen y push el container en Registry Heroku
-```
+
+### 5. Build & Deploy manual (opcional)
+
+```bash
 heroku container:push web
-```
-Ejecute la image en la aplicacion
-```
 heroku container:release web
-```
-Verificar aplicacion node en el navegador
-```
 heroku open
 ```
-Verificar Logs
-```
+
+### 6. Ver logs
+
+```bash
 heroku logs --tail
 ```
 
-### Habilitar Api Key en Heroku para integrar con Github Actions
+---
+
+## ⚙️ CI/CD Automatizado con GitHub Actions
+
+### Configuración
+
+1. Agrega tu **HEROKU\_API\_KEY** como `secret` en GitHub:
+
+   * Ve a *Settings > Secrets and variables > Actions*
+   * Agrega una nueva secret con nombre `HEROKU_API_KEY`
+
+2. Verifica en `.github/workflows/deploy.yml` que estén configurados:
+
+```yaml
+heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+heroku_app_name: "nombre-de-tu-app"
+heroku_email: "tu-email@ejemplo.com"
+remote_branch: "master"
+usedocker: true
+```
+
+---
+
+## 🔐 Seguridad Integrada en CI/CD
+
+Se añadieron herramientas automáticas para detectar vulnerabilidades y errores de seguridad en cada push:
+
+### 1. **npm audit**
+
+* Escanea dependencias npm por vulnerabilidades conocidas.
+* Ejecutado en `.github/workflows/security-npm.yml`.
+
+### 2. **CodeQL** (GitHub Native)
+
+* Análisis estático del código JavaScript.
+* Detecta errores de seguridad en el código fuente.
+* Ejecutado en `.github/workflows/codeql.yml`.
+
+### 3. **Trivy**
+
+* Escaneo de vulnerabilidades y misconfiguraciones en la imagen Docker.
+* Ejecutado en `.github/workflows/trivy.yml`.
+
+### 4. **Gitleaks**
+
+* Escanea el código fuente en busca de **secrets** o **claves expuestas**.
+* Ejecutado en `.github/workflows/gitleaks.yml`.
+
+> ✅ Todos los resultados pueden verse en la pestaña **Actions** de GitHub.
+
+---
+
+## 🧪 ¿Cómo correr escaneos manualmente?
+
+Desde tu entorno local también podés ejecutar:
+
+```bash
+npm audit
+trivy image nombre-de-la-imagen
+gitleaks detect --source .
+```
+
+---
+
+## 📌 Créditos
+
+Proyecto original forkeado desde: [GinoDevOps/vulnerable-web-app](https://github.com/GinoDevOps/vulnerable-web-app)
+
+---
+
+## ✉️ Contacto
+
+Pedro Echeverría – 2025
+Desarrollado como parte del examen práctico final de DevSecOps.
 
 ```
-Desde la plataforma Heroku ir a -> Account setting y buscar ApliKey
-```
 
-### Para Desplegar la aplicacion desde Github Action , se tiene un template base en .github/worflows/deploy.yml
-
-Donde se tiene que remplazar los siguientes datos
-
-```
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: "app-vulnerable2022" #Nombre de la app, creado anteriormente
-          heroku_email: "xxx@gmail.com"
-          remote_branch: "master"
-          usedocker: true
-``` 
-Ahora tienen que integrar herramientas de seguridad dentro del CICD
-
-### Manos a la Obra
 
